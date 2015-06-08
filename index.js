@@ -6,7 +6,7 @@ var objectAssign = require('object-assign');
 var replaceExt = require('replace-ext');
 var babel = require('babel-core');
 
-module.exports = function (opts) {
+module.exports = function (opts, wrapOpts) {
 	opts = opts || {};
 
 	return through.obj(function (file, enc, cb) {
@@ -34,7 +34,11 @@ module.exports = function (opts) {
 			}
 
 			file.contents = new Buffer(res.code);
-			file.path = replaceExt(file.path, '.js');
+
+			if (typeof wrapOpts === 'undefined' || wrapOpts.replaceExt) {
+				file.path = replaceExt(file.path, '.js');
+			}
+
 			this.push(file);
 		} catch (err) {
 			this.emit('error', new gutil.PluginError('gulp-babel', err, {fileName: file.path, showProperties: false}));
